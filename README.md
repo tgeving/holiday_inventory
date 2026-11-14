@@ -1,2 +1,2 @@
 # holiday_inventory
-Keeps track of holiday department '56 houses and other holiday items that I have in my house
+Welcome. I built this application to migrate a static Holiday Inventory Google Spreadsheet into a scalable, automated full-stack solution. The tech stack features a FastAPI and PostgreSQL backend, TypeScript and Playwright for web scraping and end-to-end testing, and Pytest for backend API validation.
