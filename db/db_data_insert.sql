@@ -301,3 +301,90 @@ WHERE cat.category_name = 'Figurine';
 
 -- 7. Clean up staging
 DROP TABLE item_stage;
+
+
+-- adding in accessories
+ALTER TABLE item DROP CONSTRAINT IF EXISTS item_item_name_key;
+-- 1. Create temporary staging table for the Accessories tab
+CREATE TEMP TABLE item_stage (
+    manufacturer_name TEXT,
+    collection_name TEXT,
+    sku TEXT,
+    item_name TEXT,
+    bin_no TEXT,
+    full_set TEXT,
+    org_total_no TEXT,
+    actual_total_no TEXT,
+    total_missing_no TEXT,
+    price TEXT,
+    notes TEXT
+);
+
+-- 2. Insert all rows into staging
+INSERT INTO item_stage VALUES
+('Department 56', 'Village Accessories', '52722', 'Holy Split Rail Fence', '1', 'Yes', '4', '', '', '18', ''),
+('Department 56', 'Village Accessories', '52722', 'Holy Split Rail Fence', '1', 'Yes', '4', '', '', '18', ''),
+('Department 56', 'Heritage Village Collection', '5513-1', 'Town Square Gazebo', '1', 'Yes', '1', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5252-3', 'Victorian Wrought Iron Fence & Gate', '1', 'Yes', '5', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '9871-0', 'Postern', '1', 'Yes', '1', '', '', '17.5', ''),
+('Department 56', 'Heritage Village Collection', '5807-6', 'Churchyard Fence', '1', 'Yes', '4', '', '', '16.5', ''),
+('Department 56', 'Village Accessories', '52646', 'Stone Footbridge', '1', 'Yes', '1', '', '', '16', ''),
+('Department 56', 'Heritage Village Collection', '5575-1', 'Victoria Station Train Platform', '1', 'Yes', '1', '', '', '22', ''),
+('Department 56', 'Village Accessories', '52635', 'Mill Creek Bridge', '13', 'yes', '1', '', '', '', ''),
+('Department 56', 'Village Accessories', '52633', 'Straight Section', '13', 'yes', '1', '', '', '', ''),
+('Department 56', 'Village Accessories', '52634', 'Curved Section', '13', 'yes', '1', '', '', '', ''),
+('Department 56', 'Village Accessories', '52654', 'Mill Creek Park Bench', '13', 'yes', '1', '', '', '14', ''),
+('Department 56', 'Village Accessories', '56.53154', 'Let''s Swing', '16', 'yes', '1', '', '', '30', ''),
+('Department 56', 'Village Accessories', '810830', 'Classic Luminaries', '17', 'yes', '2', '', '', '20', ''),
+('Department 56', 'Village Accessories', '810830', 'Classic Luminaries', '17', 'yes', '2', '', '', '20', '');
+
+-- 3. Auto-ensure any new manufacturers, collections, or bins exist
+INSERT INTO manufacturer (manufacturer_name)
+SELECT DISTINCT manufacturer_name FROM item_stage
+ON CONFLICT (manufacturer_name) DO NOTHING;
+
+INSERT INTO collection (collection_name)
+SELECT DISTINCT collection_name FROM item_stage
+ON CONFLICT (collection_name) DO NOTHING;
+
+INSERT INTO bin (bin_no)
+SELECT DISTINCT bin_no::numeric FROM item_stage
+WHERE bin_no ~ '^[0-9]+$'
+ON CONFLICT (bin_no) DO NOTHING;
+
+-- 4. Insert rows into the main item table under the 'Accessories' category
+INSERT INTO item (
+    manufacturer_id, 
+    collection_id, 
+    category_id,
+    bin_id, 
+    sku, 
+    item_name, 
+    full_set, 
+    org_total_no, 
+    actual_total_no, 
+    total_missing_no, 
+    price, 
+    notes
+)
+SELECT 
+    m.id, 
+    c.id, 
+    cat.id,
+    b.id, 
+    s.sku, 
+    s.item_name, 
+    s.full_set, 
+    NULLIF(s.org_total_no, '')::numeric, 
+    NULLIF(s.actual_total_no, '')::numeric, 
+    NULLIF(s.total_missing_no, '')::numeric, 
+    NULLIF(s.price, '')::numeric, 
+    NULLIF(s.notes, '')
+FROM item_stage s
+JOIN manufacturer m ON m.manufacturer_name = s.manufacturer_name
+JOIN collection c ON c.collection_name = s.collection_name
+JOIN category cat ON cat.category_name = 'Accessories'
+LEFT JOIN bin b ON b.bin_no = NULLIF(s.bin_no, '')::numeric;
+
+-- 5. Clean up staging
+DROP TABLE item_stage;
