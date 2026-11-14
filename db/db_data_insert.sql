@@ -151,3 +151,153 @@ JOIN bin b ON b.bin_no = s.bin_no::numeric;
 
 -- 5. Clean up staging
 DROP TABLE item_stage;
+
+---- figures
+
+-- 1. Ensure bin_no has a unique constraint so ON CONFLICT works
+ALTER TABLE bin DROP CONSTRAINT IF EXISTS bin_no_unique;
+ALTER TABLE bin ADD CONSTRAINT bin_no_unique UNIQUE (bin_no);
+ALTER TABLE item DROP CONSTRAINT IF EXISTS item_sku_key;
+
+
+-- 2. Create temporary staging table for the Figurine tab
+CREATE TEMP TABLE item_stage (
+    manufacturer_name TEXT,
+    collection_name TEXT,
+    sku TEXT,
+    item_name TEXT,
+    bin_no TEXT,
+    full_set TEXT,
+    org_total_no TEXT,
+    actual_total_no TEXT,
+    total_missing_no TEXT,
+    price TEXT,
+    notes TEXT
+);
+
+-- 3. Insert all rows into staging
+INSERT INTO item_stage VALUES
+('Department 56', 'Heritage Village Collection', '5578-6', 'Royal Coach', '9', 'Yes', '1', '', '', '56', ''),
+('Department 56', 'Heritage Village Collection', '56390', 'Candy Cane Elves', '11', 'no', '2', '1', '1', '', 'Missing an elf'),
+('Department 56', 'New England Village Series', '56.57108', 'Hear Ye Citizens', '11', 'yes', '1', '', '', '15', ''),
+('Department 56', 'Dickens'' Village', '56.58595', 'One More Christmas Card To Post, Please', '11', 'yes', '1', '', '', '15', ''),
+('Department 56', 'Dickens'' Village', '56.5846', 'Under The Bumbershoot', '11', 'yes', '1', '', '', '20', ''),
+('Department 56', 'Dickens'' Village', '58393', 'Ye Old Lamplighter', '11', 'yes', '1', '', '', '', ''),
+('Department 56', 'North Pole Series', '56.5609', 'Santa & Mrs. Clause', '11', 'yes', '2', '', '', '15', ''),
+('Department 56', 'North Pole Series', '56.56841', 'Coca-Cola Taste Test', '11', 'yes', '1', '', '', '17.5', ''),
+('Department 56', 'Heritage Village Collection', '56372', 'Don''t Break The Ornaments', '11', 'yes', '2', '', '', '27.5', ''),
+('Department 56', 'Heritage Village Collection', '5571-9', 'Holiday Travelers', '14', 'yes', '3', '', '', '25', ''),
+('Department 56', 'Dickens'' Village', '804449', 'Heading Home From The Market', '14', 'yes', '1', '', '', '17.5', ''),
+('Department 56', 'Heritage Village Collection', '5564-6', 'Street Musicians', '14', 'yes', '3', '', '', '25.5', ''),
+('Department 56', 'Heritage Village Collection', '5654-5', 'Over The River and Through The Woods', '14', 'Yes', '1', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5816-5', 'Chelsea Lane Shoppers', '14', 'Yes', '4', '', '', '30.5', ''),
+('Department 56', 'Dickens'' Village', '58410', 'Here We Come A-Wassailing', '18', 'yes', '5', '', '', '45', ''),
+('Department 56', 'Dickens'' Village', '58400', 'The Fezzwig Delivery Wagon', '19', 'yes', '1', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '56.58631', 'Christmas Carolers', '19', 'yes', '3', '', '', '27.5', ''),
+('Department 56', 'Heritage Village Collection', '5966-8', 'Shopkeepers', '20', 'yes', '4', '', '', '20', ''),
+('Department 56', 'Heritage Village Collection', '5884-0', 'Chamber Orchestra', '20', 'yes', '4', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '56594', 'Christmas Bazaar ... Handmade Quilts', '20', 'yes', '2', '', '', '25', ''),
+('Department 56', 'Dickens'' Village', '56.583', 'A Peaceful Glow On Christmas', '23', 'yes', '3', '', '', '30', ''),
+('Department 56', 'Heritage Village Collection', '5581-6', 'Kings Road Cab', '23', 'yes', '1', '', '', '30', ''),
+('Department 56', 'North Pole Series', '4023617', 'Lightning''s Ready To Race', '24', 'Yes', '1', '', '', '30', ''),
+('Department 56', 'Heritage Village Collection', '58403', 'A Christmas Carol'' Reading By Charles Dickens', '24', 'Yes', '4', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '58414', 'Until We Meet Again', '24', 'Yes', '2', '', '', '27.5', ''),
+('Department 56', 'Heritage Village Collection', '5561-1', 'Holiday Coach', '', 'yes', '', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5551-4', 'David Copperfield', '', 'yes', '5', '', '', '32.5', ''),
+('Department 56', 'Heritage Village Collection', '5570-0', 'Carolers On The Doorstep', '', 'yes', '4', '', '', '25', ''),
+('Department 56', 'Heritage Village Collection', '5588-3', 'A Christmas Carol Morning', '', 'yes', '3', '', '', '18', ''),
+('Department 56', 'Heritage Village Collection', '5803-3', 'The Bird Seller', '', 'yes', '3', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5839-4', 'Cobbler & Clock Peddler', '', 'yes', '2', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '56.5881', 'Making Bobbin Lace', '', 'yes', '1', '', '', '15', ''),
+('Department 56', 'Dickens'' Village', '56.5852', 'Holiday Quintet', '', 'no', '6', '5', '1', '37.5', 'Missing the fluet player'),
+('Department 56', 'Dickens'' Village', '56.5855', 'Street Merchants', '', 'Yes', '3', '', '', '17.5', ''),
+('Department 56', 'Dickens'' Village', '807230', 'Dickens Carolers', '', 'Yes', '1', '', '', '28.5', ''),
+('Department 56', 'Heritage Village Collection', '5826-2', 'Chelsea Market Mistetoe Monger & Cart', '', 'Yes', '2', '', '', '25', ''),
+('Department 56', 'Heritage Village Collection', '565996', 'Christmas Bazaar ...Flap Jacks & Hot Cider', '', 'Yes', '2', '', '', '27.5', ''),
+('Department 56', 'Christmas In The City Series', '58901', 'A Carriage Ride For The Bride', '', 'yes', '1', '', '', '40', ''),
+('Department 56', 'Heritage Village Collection', '58402', 'Gingerbread Vendor', '', 'Yes', '2', '', '', '22.5', ''),
+('Department 56', 'Heritage Village Collection', '58858', 'Holiday Field Trip', '', 'Yes', '3', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '58326', 'Delievering Coal For The Hearth', '', 'yes', '2', '', '', '32.5', ''),
+('Department 56', 'Dickens'' Village', '56.58387', 'Twelve Drumers Drumming', '', 'Yes', '1', '', '', '65', ''),
+('Department 56', 'Dickens'' Village', '58379', 'Four Calling Birds', '', 'Yes', '2', '', '', '32.5', ''),
+('Department 56', 'Dickens'' Village', '58382', 'Six Geese A Laying', '', 'Yes', '2', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '58381', 'Five Golden Rings', '', 'Yes', '2', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '58385', 'Nine Ladies Dancing', '', 'Yes', '3', '', '', '30', ''),
+('Department 56', 'Dickens'' Village', '58378', 'Three French Hens', '', 'Yes', '3', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '58386', 'Ten Pipers Piping', '', 'Yes', '3', '', '', '30', ''),
+('Department 56', 'Dickens'' Village', '58383', 'Seven Swans A Swimming', '', 'Yes', '4', '', '', '27.5', ''),
+('Department 56', 'Dickens'' Village', '58384', 'Eight Maids A-Milking', '', 'Yes', '2', '', '', '25', ''),
+('Department 56', 'Dickens'' Village', '58413', 'Eleven Lords A-Leaping', '', '', '1', '', '', '27.5', ''),
+('Department 56', 'Dickens'' Village', '5835-1', 'A Partridge In A Pear Tree', '', '', '1', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '5836-0', 'Two Turtle Doves', '', 'Yes', '4', '', '', '32.5', ''),
+('Department 56', 'Heritage Village Collection', '5820-3', 'Dashing Through The Snow', '', 'yes', '1', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5619-7', 'Buying Baker''s Bread', '', 'Yes', '2', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '5817-3', 'Vision Of A Christmas Past', '', 'Yes', '3', '', '', '', ''),
+('Department 56', 'Heritage Village Collection', '58396', 'Caroling With The Cratchit Family', '', 'yes', '3', '', '', '', ''),
+('Department 56', 'Dickens'' Village', '58415', 'Child''s Play', '', 'Yes', '2', '', '', '25', ''),
+('Department 56', 'Heritage Village Collection', '5540-9', 'Rest Ye Merry Gentleman', '', 'yes', '1', '', '', '13', ''),
+('Department 56', 'New England Village Series', '5656615', 'Pennyfarthing Pedaling', '', 'yes', '1', '', '', '13.5', ''),
+('Department 56', 'Dickens'' Village', '58411', 'Sitting In Camden Park', '', 'Yes', '4', '', '', '35', ''),
+('Department 56', 'Heritage Village Collection', '5928-5', 'Fezziwegs and friends', '', 'Yes', '3', '', '', '12.5', ''),
+('Department 56', 'New England Village Series', '56631', 'Under the Mistletoe', '', 'Yes', '1', '', '', '16.5', ''),
+('Department 56', 'North Pole Series', '56.56443', 'Happy New Year', '', 'yes', '1', '', '', '17.5', ''),
+('Department 56', 'Seasons Bay', '53323', 'Fun In The Snow', '', 'Yes', '2', '', '', '15', ''),
+('Department 56', 'Heritage Village Collection', '5828-9', 'Portobello Road Peddler', '', 'No', '3', '', '', '27.5', 'Missing stanta ordament for the peddler'),
+('Department 56', 'Dickens'' Village', '6.58537', 'Bob Cratchit and Tiny Tim', '', 'Yes', '1', '', '', '15', '');
+
+-- 4. Ensure 'Figurine' category exists
+INSERT INTO category (category_name)
+VALUES ('Figurine')
+ON CONFLICT (category_name) DO NOTHING;
+
+-- 5. Auto-ensure any new manufacturers, collections, or bins exist
+INSERT INTO manufacturer (manufacturer_name)
+SELECT DISTINCT manufacturer_name FROM item_stage
+ON CONFLICT (manufacturer_name) DO NOTHING;
+
+INSERT INTO collection (collection_name)
+SELECT DISTINCT collection_name FROM item_stage
+ON CONFLICT (collection_name) DO NOTHING;
+
+INSERT INTO bin (bin_no)
+SELECT DISTINCT bin_no::numeric FROM item_stage
+WHERE bin_no ~ '^[0-9]+$'
+ON CONFLICT (bin_no) DO NOTHING;
+
+-- 6. Insert rows into the main item table (appending alongside your previous house items)
+INSERT INTO item (
+    manufacturer_id, 
+    collection_id, 
+    category_id,
+    bin_id, 
+    sku, 
+    item_name, 
+    full_set, 
+    org_total_no, 
+    actual_total_no, 
+    total_missing_no, 
+    price, 
+    notes
+)
+SELECT 
+    m.id, 
+    c.id, 
+    cat.id,
+    b.id, 
+    s.sku, 
+    s.item_name, 
+    s.full_set, 
+    NULLIF(s.org_total_no, '')::numeric, 
+    NULLIF(s.actual_total_no, '')::numeric, 
+    NULLIF(s.total_missing_no, '')::numeric, 
+    NULLIF(s.price, '')::numeric, 
+    NULLIF(s.notes, '')
+FROM item_stage s
+JOIN manufacturer m ON m.manufacturer_name = s.manufacturer_name
+JOIN collection c ON c.collection_name = s.collection_name
+CROSS JOIN category cat 
+LEFT JOIN bin b ON b.bin_no = NULLIF(s.bin_no, '')::numeric
+WHERE cat.category_name = 'Figurine';
+
+-- 7. Clean up staging
+DROP TABLE item_stage;
