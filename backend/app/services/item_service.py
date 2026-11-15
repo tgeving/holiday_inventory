@@ -1,7 +1,7 @@
+from backend.app.database import get_db_connection
+
 def get_all_items() -> list[dict]:
-    # Placeholder data until you connect your SQL database
-    return [
-        {"id": 1, "name": "LED String Lights", "category": "Lighting", "quantity": 10},
-        {"id": 2, "name": "Inflatable Snowman", "category": "Outdoor", "quantity": 2},
-        {"id": 3, "name": "Glass Ornament Set", "category": "Tree", "quantity": 24},
-    ]
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, item_name, sku FROM item ORDER BY id;")
+            return cur.fetchall()
