@@ -6,7 +6,7 @@ def test_get_all_items_queries_database(mock_get_conn):
     # Setup fake database response
     mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [
-        {"id": 1, "name": "LED String Lights", "category": "Lighting", "quantity": 10}
+        {"id": 1, "item_name": "LED String Lights", "sku": "LED-001"}
     ]
     mock_get_conn.return_value.__enter__.return_value.cursor.return_value.__enter__.return_value = mock_cursor
 
@@ -15,7 +15,7 @@ def test_get_all_items_queries_database(mock_get_conn):
 
     # Verify SQL executed and returned expected rows
     mock_cursor.execute.assert_called_once_with(
-        "SELECT id, name, category, quantity FROM items ORDER BY id;"
+        "SELECT id, item_name, sku FROM item ORDER BY id;"
     )
     assert len(items) == 1
-    assert items["name"] == "LED String Lights"
+    assert items[0]["item_name"] == "LED String Lights"
