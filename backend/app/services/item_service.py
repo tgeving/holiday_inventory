@@ -9,21 +9,32 @@ ALLOWED_SORT_COLUMNS = {
 ALLOWED_SORT_ORDERS = {"asc": "ASC", "desc": "DESC"}
 
 def get_all_items(
-    category: str | None = None,
-    collection: str | None = None,
-    bin_no: str | None = None,
     search: str | None = None,
     sort_by: str = "created_at",
     order: str = "asc",
     limit: int = 50,
     offset: int = 0,
 ) -> list[dict]:
+    """Fetch all holiday inventory items with optional filtering, sorting, and pagination.
+    Args:
+        search: Partial keyword to match across item name, SKU, category,
+            collection, manufacturer, or bin number. Defaults to None.
+        sort_by: Column name to sort results by (e.g., "created_at", "item_name"). Defaults to "created_at".
+        order: Sort direction, either "asc" or "desc". Defaults to "asc".
+        limit: Maximum number of items to return per page. Defaults to 0
+        offset: Number of items to skip before returning results. Defaults to 0
+    """
+
     query = """
         SELECT 
-            i.id,
+            i.id as item_id,
+            m.id as manufacturer_id,
             m.manufacturer_name, 
+            c.id as category_id,
             c.category_name, 
+            c2.id as collection_id,
             c2.collection_name, 
+            b.id as bin_id,
             b.bin_no, 
             i.created_at, 
             i.sku, 
@@ -42,31 +53,58 @@ def get_all_items(
     conditions = []
     params = []
 
-    if category:
-        conditions.append("c.category_name ILIKE %s")
-        params.append(category)
-
-    if collection:
-        conditions.append("c2.collection_name ILIKE %s")
-        params.append(collection)
-
-    if bin_no:
-        conditions.append("b.bin_no ILIKE %s")
-        params.append(bin_no)
-
     if search:
-        conditions.append("(i.item_name ILIKE %s OR i.sku ILIKE %s)")
-        params.extend([f"%{search}%", f"%{search}%"])
+        pattern = f"%{search}%"
+        
+        # Strict Hierarchical (Waterfall) Logic:
+        # 1. Checks if collection name matches.
+        # 2. If NO items match the collection name, it falls back to checking 
+        #    categories, item names, manufacturers, and bins (blocking lower noise 
+        #    if a higher tier match is active).
+        conditions.append("""(
+            c2.collection_name ILIKE %s
+            OR (
+                NOT EXISTS (
+                    SELECT 1 
+                    FROM item sub_i 
+                    LEFT JOIN collection sub_c2 ON sub_i.collection_id = sub_c2.id 
+                    WHERE sub_c2.collection_name ILIKE %s
+                ) 
+                AND (
+                    c.category_name ILIKE %s 
+                    OR i.item_name ILIKE %s 
+                    OR m.manufacturer_name ILIKE %s 
+                    OR b.bin_no::text ILIKE %s
+                    OR i.sku ILIKE %s
+                )
+            )
+        )""")
+        params.extend([pattern, pattern, pattern, pattern, pattern, pattern, pattern])
 
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
     safe_column = ALLOWED_SORT_COLUMNS.get(sort_by, "i.created_at")
     safe_order = ALLOWED_SORT_ORDERS.get(order.lower(), "ASC")
-    query += f" ORDER BY {safe_column} {safe_order}, i.id ASC LIMIT %s OFFSET %s;"
-    params.extend([limit, offset])
 
+    # Single ORDER BY statement
+    query += f" ORDER BY {safe_column} {safe_order}, i.id ASC"
+
+    # Clean conditional handling for limit/offset
+    if limit > 0 and offset > 0:
+        query += f" LIMIT %s OFFSET %s;"
+        params.extend([limit, offset])    
+    elif limit > 0:
+        query += f" LIMIT %s;"
+        params.extend([limit])    
+    elif offset > 0:
+        query += f" OFFSET %s;"
+        params.extend([offset])    
+    else:
+        query += ";"
+    
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(query, params)
             return cur.fetchall()
+        
