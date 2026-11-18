@@ -264,6 +264,8 @@ SELECT DISTINCT bin_no::numeric FROM item_stage
 WHERE bin_no ~ '^[0-9]+$'
 ON CONFLICT (bin_no) DO NOTHING;
 
+insert into location(location_name) values('Office'),('Kitchen - Pantry'), ('Kitchen - Main Cabinet'), ('Kitchen - Fridge - Cabinet'), ('Kitchen - Cabinet'), ('Dinet - Tree'),('Downstairs - Tree')
+
 -- 6. Insert rows into the main item table (appending alongside your previous house items)
 INSERT INTO item (
     manufacturer_id, 

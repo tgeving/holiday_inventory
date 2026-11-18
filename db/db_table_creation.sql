@@ -34,6 +34,14 @@ CREATE TABLE bin (
     deleted_at TIMESTAMP
 );
 
+-- location of rooms
+create table location(
+ id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ location_name VARCHAR(100) UNIQUE NOT null,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ updated_at TIMESTAMP,
+ deleted_at TIMESTAMP
+);
 
 -- items information
 CREATE TABLE item (
