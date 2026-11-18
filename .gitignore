@@ -26,3 +26,4 @@ env/
 Thumbs.db
 .vscode/
 .idea/
+backend/app/__pycache__/main.cpython-315.pyc
