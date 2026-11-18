@@ -27,3 +27,6 @@ Thumbs.db
 .vscode/
 .idea/
 backend/app/__pycache__/main.cpython-315.pyc
+
+__pycache__/
+*.py[cod]
