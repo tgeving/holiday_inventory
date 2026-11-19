@@ -10,7 +10,7 @@ def _setup_mock_cursor(mock_get_conn, return_rows=None):
     return mock_cursor
 
 
-@patch("backend.app.services.category_service.get_db_connection")
+@patch("backend.app.services.categories_service.get_db_connection")
 def test_get_all_categories_default_query(mock_get_conn):
     """Test that get_all_categories constructs the correct SQL query with default parameters and returns expected results."""
     
@@ -36,7 +36,7 @@ def test_get_all_categories_default_query(mock_get_conn):
     assert result[0]["category_name"] == category_name
 
 
-@patch("backend.app.services.category_service.get_db_connection")  # Fixed: was item_service
+@patch("backend.app.services.categories_service.get_db_connection")  
 def test_get_all_categories_with_search(mock_get_conn):
     """Test that get all categories based off of the search term 'Trees' and returns expected results."""
     mock_cursor = _setup_mock_cursor(mock_get_conn)
@@ -51,7 +51,7 @@ def test_get_all_categories_with_search(mock_get_conn):
     assert executed_params == [f"%{search_term}%", 50]
 
 
-@patch("backend.app.services.category_service.get_db_connection")  # Fixed: was item_service
+@patch("backend.app.services.categories_service.get_db_connection")  
 def test_get_all_categories_with_filters_sorting_and_pagination(mock_get_conn):
     """Test that get_all_categories constructs the correct SQL query with filters, sorting, and pagination."""
     mock_cursor = _setup_mock_cursor(mock_get_conn)
