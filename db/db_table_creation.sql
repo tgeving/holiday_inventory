@@ -65,6 +65,11 @@ CREATE TABLE item (
     constraint fk_bin_id
     foreign key (bin_id) references bin(id)
     on delete cascade, 
+
+    location_id INT,
+    constraint fk_location_id
+    foreign key (location_id) references location(id)
+    on delete cascade, 
     
     sku text UNIQUE NOT NULL,
     item_name text UNIQUE NOT NULL,
