@@ -101,10 +101,25 @@ CREATE TABLE themes (
     constraint fk_bin_id
     foreign key (bin_id) references bin(id)
     on delete cascade,
-    location VARCHAR(100) UNIQUE NOT NULL,
+
+    location_id INT, 
+    constraint fk_location_id
+    foreign key (location_id) references location(id)
+    on delete cascade,
+
+    manufacturer_id INT,
+    constraint fk_manufacturer_id
+    foreign key (manufacturer_id) references manufacturer(id)
+    on delete cascade,
+    
+    collection_id INT,
+    constraint fk_collection_id
+    foreign key (collection_id) references collection(id)
+    on delete cascade,
+
     line_no numeric,
     theme_name  text, 
-    theme_year TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    theme_year TYPE SMALLINT, 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
