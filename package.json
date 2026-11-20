@@ -1,0 +1,25 @@
+{
+  "name": "holiday_inventory",
+  "version": "1.0.0",
+  "description": "Welcome. I built this application to migrate a static Google Spreadsheet into a scalable, automated full-stack solution. The tech stack features a FastAPI and PostgreSQL backend, TypeScript and Playwright for web scraping and end-to-end testing, and Pytest for backend API validation.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tgeving/holiday_inventory.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tgeving/holiday_inventory/issues"
+  },
+  "homepage": "https://github.com/tgeving/holiday_inventory#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  }
+}
