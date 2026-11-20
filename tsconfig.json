@@ -3,10 +3,11 @@
     "target": "ES2022",
     "module": "CommonJS",
     "moduleResolution": "bundler",
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true
   },
-  "include": ["playwright.config.ts", "automation/**/*.ts"],
+  "include": ["automation/**/*.ts", "playwright.config.ts"],
   "exclude": ["node_modules", "ui"]
 }

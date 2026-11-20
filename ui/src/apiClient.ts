@@ -34,7 +34,7 @@ export class ApiClient {
   }
 
   // Example endpoint #1: Get All Items
-  getAllItems(): Promise<import('./types').Item[]> {
+  getAllItems(): Promise<import('./type').Item[]> {
     return this.getList('/items'); // Change to '/api/items' if your route has an /api prefix
   }
 }
