@@ -1,5 +1,5 @@
 export interface Item {
-  id: number;
+  item_id: number;
   item_name: string;
   category_id?: number | null;
   bin_id?: number | null;

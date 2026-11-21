@@ -27,7 +27,7 @@ function renderItems(items: Item[]): void {
     row.dataset.testid = 'item-row';
 
     const idCell = document.createElement('td');
-    idCell.textContent = String(item.id);
+    idCell.textContent = String(item.item_id)
 
     const nameCell = document.createElement('td');
     nameCell.textContent = item.item_name;
