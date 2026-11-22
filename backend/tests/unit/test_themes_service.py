@@ -28,7 +28,7 @@ def test_get_all_themes_default_query(mock_get_conn):
 
     executed_sql, executed_params = mock_cursor.execute.call_args[0]
     assert "WHERE" not in executed_sql
-    assert "ORDER BY created_at ASC, id ASC LIMIT %s;" in executed_sql
+    assert "ORDER BY created_at ASC, t.id ASC LIMIT %s;" in executed_sql
     assert executed_params == [50]  # Matches limit=50 default in service
     assert len(result) == 1
     assert result[0]["theme_name"] == theme_name
@@ -67,6 +67,6 @@ def test_get_all_theme_with_filters_sorting_and_pagination(mock_get_conn):
 
     executed_sql, executed_params = mock_cursor.execute.call_args[0]
     assert "theme_name = %s" in executed_sql  # Updated to check exact match
-    assert "ORDER BY theme_name DESC, id ASC LIMIT %s OFFSET %s;" in executed_sql
+    assert "ORDER BY theme_name DESC, t.id ASC LIMIT %s OFFSET %s;" in executed_sql
     assert executed_params == [theme_name, limit, offset]  # Exact value + limit + offset
     
