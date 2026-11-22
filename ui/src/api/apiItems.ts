@@ -1,4 +1,4 @@
-export class ApiClient {
+export class ApiItem {
   private readonly baseUrl: string;
 
   constructor(baseUrl: string = 'http://localhost:8001') {
@@ -34,7 +34,7 @@ export class ApiClient {
   }
 
   // Example endpoint #1: Get All Items
-  getAllItems(): Promise<import('./type').Item[]> {
+  getAllItems(): Promise<import('../types/itemTypes').Item[]> {
     return this.getList('/items'); // Change to '/api/items' if your route has an /api prefix
   }
 }
