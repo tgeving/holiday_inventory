@@ -1,7 +1,7 @@
-import { ApiClient } from './apiClient';
-import { Item } from './type';
+import { ApiItem } from '../api/apiItems';
+import { Item } from '../types/itemTypes';
 
-const api = new ApiClient(import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001');
+const api = new ApiItem(import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001');
 
 const searchInput = document.querySelector<HTMLInputElement>('[data-testid="item-search"]');
 const statusEl = document.querySelector<HTMLParagraphElement>('[data-testid="status-message"]');
