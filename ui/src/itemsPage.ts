@@ -27,18 +27,32 @@ function renderItems(items: Item[]): void {
     row.dataset.testid = 'item-row';
 
     const idCell = document.createElement('td');
+    idCell.id = `item_id_${item.item_id}`
     idCell.textContent = String(item.item_id)
+
+    const manufacturerCell = document.createElement('td');
+    manufacturerCell.id = `manufacturer_name${item.manufacturer_name}`
+    manufacturerCell.textContent = String(item.manufacturer_name)
+
+    const collectionCell = document.createElement('td');
+    collectionCell.id = `collection_name${item.collection_name}`
+    collectionCell.textContent = String(item.collection_name)
+
+    const categoryCell = document.createElement('td');
+    categoryCell.id = `category_name${item.category_name}`
+    categoryCell.textContent = String(item.category_name)
+
+    row.append(idCell)
+    const tbody = document.querySelector('tbody')
+    tbody?.appendChild(row)
 
     const nameCell = document.createElement('td');
     nameCell.textContent = item.item_name;
 
-    const locationCell = document.createElement('td');
-    locationCell.textContent = item.location_id != null ? String(item.location_id) : '—';
-
     const binCell = document.createElement('td');
     binCell.textContent = item.bin_id != null ? String(item.bin_id) : '—';
 
-    row.append(idCell, nameCell, locationCell, binCell);
+    row.append(idCell, nameCell, manufacturerCell, collectionCell, categoryCell, binCell);
     tbodyEl.appendChild(row);
   }
 }

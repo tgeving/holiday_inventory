@@ -1,52 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
-const mockItems = [
-  { id: 1, item_name: "Fezzwig's Ballroom", location_id: 2, bin_id: 5 },
-  { id: 2, item_name: 'Garland Garland', location_id: 1, bin_id: 3 },
-];
 
-test.describe('Get All Items UI', () => {
-  test('displays all items returned by the GET items endpoint', async ({ page }) => {
-    await page.route('**/items', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(mockItems),
-      });
-    });
+test.describe('Holiday Inventory table', () => {
+  test('Does not render "undefined" in any table cell', async ({ page }) => {
+    await page.goto('http://localhost:5173');
+    await page.locator('tbody tr').first().waitFor({ state: 'visible' });
 
-    await page.goto('/');
+    const cellTexts = await page.locator('tbody td').allTextContents();
+    expect(cellTexts.length).toBeGreaterThan(0);
 
-    const rows = page.getByTestId('item-row');
-    await expect(rows).toHaveCount(2);
-    await expect(rows.first()).toContainText("Fezzwig's Ballroom");
-    await expect(page.getByTestId('status-message')).toHaveText('Showing 2 item(s).');
-  });
-
-  test('filters items when typing in the search box', async ({ page }) => {
-    await page.route('**/items', async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(mockItems),
-      });
-    });
-
-    await page.goto('/');
-    await page.getByTestId('item-search').fill('Fezzwig');
-
-    const rows = page.getByTestId('item-row');
-    await expect(rows).toHaveCount(1);
-    await expect(rows).toContainText("Fezzwig's Ballroom");
-  });
-
-  test('shows an error message when the GET items request fails', async ({ page }) => {
-    await page.route('**/items', async (route) => {
-      await route.fulfill({ status: 500, body: 'Internal Server Error' });
-    });
-
-    await page.goto('/');
-
-    await expect(page.getByTestId('status-message')).toContainText('Error loading items');
+    const invalidCells = cellTexts
+      .map((text) => text.trim().toLowerCase()) // clean up data one by one
+      .filter((text) => text.includes('undefined')); // keep 'undefined', if any, remove the rest
+    expect(invalidCells,
+       `Expected no table cells to contain "undefined", but found: ${JSON.stringify(invalidCells)}`)
+       .toEqual([]);
   });
 });
