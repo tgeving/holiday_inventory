@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Holiday Inventory</title>
+    <link rel="stylesheet" href="./styles/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <h1>Holiday Inventory</h1>
+      </header>
+
+      <form class="filter-form" onsubmit="event.preventDefault();">
+        <div class="form-group">
+          <label for="filter-input">Filter themes</label>
+          <input
+            id="filter-input"
+            data-testid="theme-search"
+            type="search"
+            placeholder="Search by theme name (e.g. lights, ornament)"
+          />
+        </div>
+      </form>
+
+      <p data-testid="status-message" class="status-message" role="status"></p>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Theme Name</th>
+              <th>Theme Year</th>
+              <th>Manufacturer Name</th>
+              <th>Collection Name</th>
+              <th>Category Name</th>
+              <th>Bin ID</th>
+            </tr>
+          </thead>
+          <tbody data-testid="themes-tbody"></tbody>
+        </table>
+      </div>
+    </main>
+
+    <script type="module" src="./src/pages/themesPage.ts"></script>
+  </body>
+</html>

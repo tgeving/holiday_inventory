@@ -54,13 +54,13 @@ class TestThemes:
         page1 = themes.get_all_themes(limit=2, offset=0)
         assert themes.status_code == codes.OK
         assert len(page1)==2
-        page_1_ids = {themes["id"] for themes in page1}
+        page_1_ids = {themes["theme_id"] for themes in page1}
 
         # show 25 records max on the second page
         page2 = themes.get_all_themes(limit=2, offset=2)
         assert themes.status_code == codes.OK
         assert len(page2)==2
-        page_2_ids = {themes["id"] for themes in page2}
+        page_2_ids = {themes["theme_id"] for themes in page2}
     
         intersection = page_1_ids.intersection(page_2_ids)
         assert len(intersection) == 0, f"Offset failed! Overlapping collection IDs found between page 1 and page 2: {intersection}"

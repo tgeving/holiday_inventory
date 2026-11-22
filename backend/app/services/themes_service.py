@@ -21,8 +21,29 @@ def get_all_themes(
         limit: Maximum number of items to return per page. Defaults to 50
         offset: Number of items to skip before returning results. Defaults to 0
     """
-
     query = """
+      SELECT 
+            t.id as theme_id,
+            m.id as manufacturer_id,
+            m.manufacturer_name, 
+            c.id as category_id,
+            c.category_name, 
+            c2.id as collection_id,
+            c2.collection_name, 
+            b.id as bin_id,
+            b.bin_no, 
+            t.created_at, 
+            t.theme_name, 
+            t.theme_year 
+        FROM theme t 
+        LEFT JOIN bin b ON t.bin_id = b.id 
+        LEFT JOIN category c ON t.category_id = c.id
+        LEFT JOIN collection c2 ON t.collection_id = c2.id
+        LEFT JOIN manufacturer m ON t.manufacturer_id = m.id
+        LEFT JOIN item i ON t.item_id = i.id
+    """
+
+    query_back = """
         SELECT 
             id, 
             collection_id,
@@ -50,7 +71,7 @@ def get_all_themes(
     safe_column = ALLOWED_SORT_COLUMNS.get(sort_by, "created_at")
     safe_order = ALLOWED_SORT_ORDERS.get(order.lower(), "ASC")
 
-    query += f" ORDER BY {safe_column} {safe_order}, id ASC"
+    query += f" ORDER BY {safe_column} {safe_order}, t.id ASC"
 
     if limit > 0 and offset > 0:
         query += " LIMIT %s OFFSET %s;"
